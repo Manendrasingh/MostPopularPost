@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">MostPopularPost</string>
     <string name="details">details</string>
+    <string name="get_most_popular_post">Get Most Popular Post</string>
+    <string name="internet_connection">Please check your internet connection</string>
 </resources>

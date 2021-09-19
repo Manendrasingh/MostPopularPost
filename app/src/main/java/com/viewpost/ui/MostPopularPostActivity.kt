@@ -1,19 +1,22 @@
 package com.viewpost.ui
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.viewpost.R
 import com.viewpost.adapters.RecyclerActivityAdapter
 import com.viewpost.databinding.ActivityRecyclerBinding
 import com.viewpost.utils.ApiState
+import com.viewpost.utils.NetworkState
 import com.viewpost.viewmodels.NyViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
+
 /*
 * Main screen which contain list of popular post
 * */
@@ -30,13 +33,25 @@ class MostPopularPostActivity : AppCompatActivity() {
 
         binding = ActivityRecyclerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         initRecyclerview()
-
         handleData()
+        binding.btnGetPost.setOnClickListener {
+            handleData()
+        }
+
 
     }
 
+    private fun handleData() {
+        if (NetworkState().checkForInternet(this)) {
+            handleDataFromApi()
+            binding.btnGetPost.isVisible = false
+
+        } else {
+            Toast.makeText(this, getString(R.string.internet_connection), Toast.LENGTH_LONG).show()
+            handleViewVisibility(false, false)
+            binding.btnGetPost.isVisible = true
+        }    }
 
     /*
     * initialise adapter
@@ -55,7 +70,7 @@ class MostPopularPostActivity : AppCompatActivity() {
     *
     * get data from repository and handle it
     * */
-    private fun handleData() {
+    private fun handleDataFromApi() {
         mainViewModel.getMostViewApiData()
         lifecycleScope.launchWhenStarted {
             mainViewModel._postStateFlow.collect { it ->
@@ -79,6 +94,7 @@ class MostPopularPostActivity : AppCompatActivity() {
         }
 
     }
+
     /*
 *
 * handle view visibility of view
